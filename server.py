@@ -117,7 +117,7 @@ Each object must have these exact keys:
     "Point 4 — what to say or show",
     "Point 5 — closing line or CTA"
   ],
-  "caption": "ready-to-post caption, 1-2 sentences, casual and fun tone",
+  "caption": "ready-to-post caption — if platform format is long-form YouTube video, write 4-5 sentences describing the video with energy and personality; otherwise write 1-2 sentences. Casual and fun tone.",
   "hashtags": ["#tag1", "#tag2", "#tag3"]
 }}
 
@@ -126,6 +126,7 @@ Rules:
 - hook must be the very first thing said on camera
 - hashtags should be specific and currently popular
 - keep everything fresh and relevant to 2025-2026 trends
+- NEVER use em dashes (—) anywhere in any field, use commas or full stops instead
 - respond with ONLY the JSON array, no other text"""
 
                 response = client.messages.create(

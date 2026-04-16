@@ -211,7 +211,7 @@
     transition: background .15s, color .15s, border-color .15s;
   }
   .save-btn:hover { background: #fce8f0; color: #c0607a; border-color: var(--accent); }
-  .save-btn.saved { background: #fce8f0; color: #c0607a; border-color: var(--accent); }
+  .save-btn.saved { background: #fce8f0; color: #c0607a; border-color: var(--accent); cursor: default; pointer-events: none; opacity: 0.85; }
 
   /* hook */
   .card-hook {
@@ -608,7 +608,7 @@ function renderIdeas(ideas, params) {
     titleEl.textContent = idea.title;
     const saveBtn = document.createElement('button');
     saveBtn.className = 'save-btn' + (alreadySaved ? ' saved' : '');
-    saveBtn.textContent = alreadySaved ? '♡ Saved' : '♡ Save';
+    saveBtn.textContent = alreadySaved ? '✓ Saved' : '♡ Save';
     saveBtn.addEventListener('click', () => saveIdea(idea, params, saveBtn));
     top.appendChild(titleEl);
     top.appendChild(saveBtn);
@@ -668,7 +668,7 @@ function saveIdea(idea, params, btn) {
     savedAt: new Date().toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })
   });
   save(store);
-  btn.textContent = '♡ Saved';
+  btn.textContent = '✓ Saved';
   btn.classList.add('saved');
   updateBadges();
   $('statusText').textContent = 'Saved ✓';
