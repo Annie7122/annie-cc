@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>@girlmeetsdream Content Creator</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:       #ffffff;
+    --card:     #fdf0f4;
+    --card2:    #fff7f9;
+    --border:   #f0d0da;
+    --accent:   #f4a7be;
+    --text:     #1a1a1a;
+    --muted:    #999;
+    --hover:    #e88fab;
+    --green:    #4a7a2a;
+    --green-bg: #edf7e6;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, "SF Pro Text", "Helvetica Neue", sans-serif;
+    font-size: 14px;
+    min-height: 100vh;
+  }
+  .app { display: flex; flex-direction: column; min-height: 100vh; }
+
+  /* ── header ── */
+  header {
+    padding: 22px 36px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+  }
+  header h1 {
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+  header h1 .star { color: var(--accent); }
+  .gear {
+    margin-left: auto;
+    background: none; border: none;
+    color: var(--muted); font-size: 18px;
+    cursor: pointer; padding: 4px 8px; border-radius: 6px;
+    transition: color .15s;
+  }
+  .gear:hover { color: var(--text); }
+
+  /* ── layout ── */
+  main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 262px 1fr;
+    min-height: 0;
+  }
+
+  /* ── sidebar ── */
+  .sidebar {
+    padding: 22px 18px;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  .lbl {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: .08em; color: var(--muted);
+    text-transform: uppercase;
+    margin-top: 15px; margin-bottom: 5px;
+  }
+  .lbl:first-child { margin-top: 0; }
+
+  select, textarea {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 8px;
+    padding: 8px 11px;
+    font-family: inherit; font-size: 13px;
+    outline: none;
+    appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23bbb' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    cursor: pointer;
+    transition: border-color .15s;
+  }
+  select:focus, textarea:focus { border-color: var(--accent); }
+  textarea {
+    resize: none; height: 110px;
+    background-image: none; cursor: text; line-height: 1.5;
+  }
+  textarea::placeholder { color: var(--muted); }
+
+  .gen-btn {
+    margin-top: 18px; width: 100%;
+    padding: 12px;
+    background: var(--accent); color: #fff;
+    border: none; border-radius: 10px;
+    font-size: 14px; font-weight: 700; font-family: inherit;
+    cursor: pointer;
+    transition: background .15s, transform .1s;
+  }
+  .gen-btn:hover  { background: var(--hover); }
+  .gen-btn:active { transform: scale(.98); }
+  .gen-btn:disabled { background: #f0c8d8; color: #c0a0aa; cursor: not-allowed; }
+
+  /* ── right pane ── */
+  .right-pane { display: flex; flex-direction: column; min-height: 0; }
+
+  /* ── tabs ── */
+  .tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    flex-shrink: 0;
+  }
+  .tab {
+    padding: 14px 16px 12px;
+    font-size: 13px; font-weight: 600;
+    color: var(--muted);
+    cursor: pointer; border: none; background: none;
+    font-family: inherit;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color .15s;
+    display: flex; align-items: center; gap: 7px;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--text); border-bottom-color: var(--accent); }
+  .badge {
+    background: var(--accent); color: #fff;
+    font-size: 10px; font-weight: 700;
+    border-radius: 10px; padding: 1px 6px;
+    display: none;
+  }
+  .badge.show { display: inline-block; }
+
+  /* ── panels ── */
+  .panel { display: none; flex: 1; flex-direction: column; overflow-y: auto; padding: 22px 28px; }
+  .panel.active { display: flex; }
+
+  .panel-header {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px; flex-shrink: 0;
+  }
+  .panel-lbl {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: .08em; color: var(--muted); text-transform: uppercase;
+  }
+  .copy-btn {
+    background: none; border: 1px solid var(--border);
+    color: var(--muted); font-size: 12px;
+    padding: 4px 10px; border-radius: 6px;
+    cursor: pointer; font-family: inherit;
+    transition: color .15s, border-color .15s;
+  }
+  .copy-btn:hover { color: var(--text); border-color: var(--muted); }
+
+  /* ── placeholder ── */
+  .placeholder {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px 28px;
+    text-align: center;
+    color: var(--muted);
+    font-style: italic;
+    flex: 1;
+  }
+
+  /* ── idea cards ── */
+  .ideas-list { display: flex; flex-direction: column; gap: 14px; }
+
+  .idea-card {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  /* card top bar */
+  .card-top {
+    padding: 14px 16px 12px;
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 10px;
+  }
+  .card-num {
+    font-size: 11px; font-weight: 700;
+    color: var(--accent); flex-shrink: 0; margin-top: 2px;
+  }
+  .card-title {
+    font-size: 15px; font-weight: 800;
+    color: var(--text); line-height: 1.35; flex: 1;
+  }
+  .save-btn {
+    flex-shrink: 0;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 5px 11px;
+    font-size: 12px; font-family: inherit;
+    color: var(--muted); cursor: pointer;
+    white-space: nowrap;
+    transition: background .15s, color .15s, border-color .15s;
+  }
+  .save-btn:hover { background: #fce8f0; color: #c0607a; border-color: var(--accent); }
+  .save-btn.saved { background: #fce8f0; color: #c0607a; border-color: var(--accent); }
+
+  /* hook */
+  .card-hook {
+    margin: 0 16px 12px;
+    background: #fff0f5;
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 9px 12px;
+    font-size: 13px; font-style: italic; color: #444;
+    line-height: 1.55;
+  }
+  .hook-label {
+    font-size: 10px; font-weight: 700; letter-spacing: .06em;
+    color: var(--accent); text-transform: uppercase;
+    display: block; margin-bottom: 4px; font-style: normal;
+  }
+
+  /* caption */
+  .card-caption {
+    margin: 0 16px 12px;
+    background: var(--card);
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-size: 13px; color: #444; line-height: 1.55;
+  }
+  .caption-label {
+    font-size: 10px; font-weight: 700; letter-spacing: .06em;
+    color: var(--muted); text-transform: uppercase;
+    display: block; margin-bottom: 4px;
+  }
+  .hashtags { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 5px; }
+  .hashtag {
+    background: #fce8f0; color: #c0607a;
+    border-radius: 20px; padding: 2px 9px;
+    font-size: 11px; font-weight: 600;
+  }
+
+  /* script toggle */
+  .script-toggle {
+    width: 100%;
+    background: none; border: none; border-top: 1px solid var(--border);
+    padding: 10px 16px;
+    font-size: 12px; font-weight: 700; font-family: inherit;
+    color: var(--muted); cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between;
+    transition: background .15s, color .15s;
+    text-transform: uppercase; letter-spacing: .06em;
+  }
+  .script-toggle:hover { background: #fdf0f4; color: var(--text); }
+  .toggle-arrow { transition: transform .2s; font-style: normal; }
+  .script-toggle.open .toggle-arrow { transform: rotate(180deg); }
+
+  .script-body {
+    display: none;
+    padding: 6px 16px 16px;
+    border-top: 1px solid var(--border);
+  }
+  .script-body.open { display: block; }
+
+  .script-point {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 7px 0;
+    border-bottom: 1px dashed var(--border);
+  }
+  .script-point:last-child { border-bottom: none; }
+  .point-num {
+    flex-shrink: 0;
+    width: 20px; height: 20px;
+    background: var(--accent); color: #fff;
+    border-radius: 50%;
+    font-size: 10px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 1px;
+  }
+  .point-text { font-size: 13px; color: #333; line-height: 1.55; }
+
+  /* ── collection cards ── */
+  .collection-empty {
+    color: var(--muted); font-style: italic;
+    font-size: 14px; padding: 48px 0; text-align: center;
+  }
+  .coll-grid { display: flex; flex-direction: column; gap: 12px; }
+  .coll-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .coll-meta {
+    font-size: 11px; color: var(--muted);
+    margin-bottom: 5px; display: flex; gap: 7px; align-items: center;
+  }
+  .coll-title { font-weight: 800; font-size: 14px; margin-bottom: 4px; }
+  .coll-hook  { font-size: 13px; color: #555; font-style: italic; }
+  .coll-actions { margin-top: 11px; display: flex; gap: 7px; }
+  .act-btn {
+    border: 1px solid var(--border);
+    border-radius: 7px; padding: 5px 12px;
+    font-size: 12px; font-family: inherit;
+    cursor: pointer; background: #fff; color: var(--text);
+    transition: background .15s, border-color .15s;
+  }
+  .act-btn:hover       { border-color: var(--accent); background: #fce8f0; }
+  .act-btn.danger:hover { background: #fde8e8; border-color: #f4a0a0; color: #c04040; }
+  .act-btn.filmed:hover { background: var(--green-bg); border-color: #86c065; color: var(--green); }
+  .filmed-badge {
+    display: inline-block;
+    background: var(--green-bg); color: var(--green);
+    border-radius: 20px; padding: 2px 9px;
+    font-size: 11px; font-weight: 700;
+  }
+
+  /* ── status ── */
+  .status-bar {
+    padding: 8px 36px;
+    border-top: 1px solid var(--border);
+    color: var(--muted); font-size: 11px;
+    display: flex; align-items: center; gap: 8px;
+    flex-shrink: 0;
+  }
+  .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 1.2s infinite; display: none;
+  }
+  .dot.active { display: block; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+  /* ── modal ── */
+  .overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.28); z-index: 100;
+    align-items: center; justify-content: center;
+  }
+  .overlay.show { display: flex; }
+  .modal {
+    background: #fff; border: 1px solid var(--border);
+    border-radius: 16px; padding: 34px;
+    width: 450px; max-width: 92vw;
+    box-shadow: 0 8px 40px rgba(0,0,0,.1);
+  }
+  .modal h2 { font-size: 21px; color: var(--accent); margin-bottom: 6px; }
+  .modal p  { color: var(--muted); font-size: 13px; margin-bottom: 20px; line-height: 1.6; }
+  .modal input {
+    width: 100%; background: var(--card);
+    border: 1px solid var(--border); color: var(--text);
+    border-radius: 8px; padding: 11px 14px;
+    font-size: 14px; font-family: inherit; outline: none;
+    margin-bottom: 6px;
+  }
+  .modal input:focus { border-color: var(--accent); }
+  .modal .hint { color: var(--muted); font-size: 11px; margin-bottom: 18px; }
+  .modal-btn {
+    width: 100%; padding: 12px;
+    background: var(--accent); color: #fff;
+    border: none; border-radius: 9px;
+    font-size: 14px; font-weight: 700; font-family: inherit;
+    cursor: pointer; transition: background .15s;
+  }
+  .modal-btn:hover { background: var(--hover); }
+  .err { color: #e05050; font-size: 12px; margin-bottom: 12px; display: none; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <h1><span class="star">✦</span> @girlmeetsdream Content Creator</h1>
+    <button class="gear" id="settingsBtn">⚙</button>
+  </header>
+
+  <main>
+    <aside class="sidebar">
+      <div class="lbl">Platform</div>
+      <select id="platform">
+        <option>Instagram</option><option>TikTok</option>
+        <option>YouTube</option><option>Pinterest</option>
+        <option>Threads</option><option>LinkedIn</option>
+      </select>
+
+      <div class="lbl">Niche / Topic</div>
+      <select id="niche">
+        <option>Beauty &amp; Skincare</option><option>Fashion &amp; OOTD</option>
+        <option>Fitness &amp; Wellness</option><option>Food &amp; Recipes</option>
+        <option>Travel &amp; Adventure</option><option>Mental Health</option>
+        <option>Career &amp; Money</option><option>Lifestyle &amp; Aesthetic</option>
+        <option>Books &amp; Learning</option><option>Relationships &amp; Dating</option>
+        <option>Home &amp; Decor</option><option>Music &amp; Dance</option>
+      </select>
+
+      <div class="lbl">Content Format</div>
+      <select id="format">
+        <option>Any format</option>
+        <option>Short-form video (Reel / TikTok)</option>
+        <option>Photo post / Carousel</option>
+        <option>Long-form video (YouTube)</option>
+        <option>Story / Behind-the-scenes</option>
+        <option>Text post / Thread</option>
+      </select>
+
+      <div class="lbl">Vibe</div>
+      <select id="vibe">
+        <option>Any vibe</option><option>Cosy &amp; Soft</option>
+        <option>Bold &amp; Empowering</option><option>Funny &amp; Relatable</option>
+        <option>Educational</option><option>Aesthetic / Dreamy</option>
+        <option>Raw &amp; Real</option>
+      </select>
+
+      <div class="lbl">Custom note (optional)</div>
+      <textarea id="custom" placeholder="e.g. summer content, moving abroad, study vlog..."></textarea>
+
+      <button class="gen-btn" id="genBtn">✦  Generate Ideas</button>
+    </aside>
+
+    <div class="right-pane">
+      <div class="tabs">
+        <button class="tab active" data-tab="generate">Generate</button>
+        <button class="tab" data-tab="saved">
+          Saved Ideas <span class="badge" id="savedBadge"></span>
+        </button>
+        <button class="tab" data-tab="filmed">
+          Filmed <span class="badge" id="filmedBadge"></span>
+        </button>
+      </div>
+
+      <!-- generate panel -->
+      <div class="panel active" id="panel-generate">
+        <div class="panel-header">
+          <span class="panel-lbl">Ideas</span>
+          <button class="copy-btn" id="copyBtn">Copy all</button>
+        </div>
+        <div id="ideasContainer">
+          <div class="placeholder">Your ideas will appear here.<br><br>Choose your settings and hit Generate.</div>
+        </div>
+      </div>
+
+      <!-- saved panel -->
+      <div class="panel" id="panel-saved">
+        <div class="panel-header"><span class="panel-lbl">Saved Ideas</span></div>
+        <div id="savedList"></div>
+      </div>
+
+      <!-- filmed panel -->
+      <div class="panel" id="panel-filmed">
+        <div class="panel-header"><span class="panel-lbl">Filmed</span></div>
+        <div id="filmedList"></div>
+      </div>
+    </div>
+  </main>
+
+  <div class="status-bar">
+    <div class="dot" id="dot"></div>
+    <span id="statusText">Ready</span>
+  </div>
+</div>
+
+<!-- modal -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h2>Welcome ✦</h2>
+    <p>Enter your Anthropic API key to start generating content ideas powered by Claude AI.</p>
+    <input type="password" id="apiKeyInput" placeholder="sk-ant-..." autocomplete="off" />
+    <div class="hint">Get a key at console.anthropic.com — you'll need a small credit (~ $5)</div>
+    <div class="err" id="keyError">Key should start with "sk-". Please check and try again.</div>
+    <button class="modal-btn" id="saveKeyBtn">Save &amp; Continue</button>
+    <button class="modal-btn" id="testKeyBtn" style="margin-top:8px;background:#fff;color:var(--text);border:1px solid var(--border);">Test Key</button>
+    <div id="testResult" style="margin-top:10px;font-size:12px;text-align:center;display:none;"></div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const STORE = 'gmd_ideas';
+
+// ── storage ───────────────────────────────────────────────────────────────────
+function load() {
+  try { return JSON.parse(localStorage.getItem(STORE)) || { saved: [], filmed: [] }; }
+  catch { return { saved: [], filmed: [] }; }
+}
+function save(data) { localStorage.setItem(STORE, JSON.stringify(data)); }
+
+// ── tabs ──────────────────────────────────────────────────────────────────────
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    $('panel-' + tab.dataset.tab).classList.add('active');
+    if (tab.dataset.tab === 'saved')  renderSaved();
+    if (tab.dataset.tab === 'filmed') renderFilmed();
+  });
+});
+
+function updateBadges() {
+  const s = load();
+  const sb = $('savedBadge'), fb = $('filmedBadge');
+  sb.textContent = s.saved.length;
+  fb.textContent = s.filmed.length;
+  sb.classList.toggle('show', s.saved.length > 0);
+  fb.classList.toggle('show', s.filmed.length > 0);
+}
+
+// ── API key ───────────────────────────────────────────────────────────────────
+let hasKey = false;
+
+async function checkKey() {
+  const r = await fetch('/config');
+  const d = await r.json();
+  hasKey = d.has_key;
+  if (d.is_cloud) {
+    // on cloud, key is set server-side — hide the settings gear
+    $('settingsBtn').style.display = 'none';
+  } else if (!hasKey) {
+    showModal();
+  }
+}
+function showModal() { $('overlay').classList.add('show'); setTimeout(() => $('apiKeyInput').focus(), 80); }
+function hideModal() { $('overlay').classList.remove('show'); }
+
+$('settingsBtn').addEventListener('click', showModal);
+$('overlay').addEventListener('click', e => { if (e.target === $('overlay')) hideModal(); });
+$('apiKeyInput').addEventListener('keydown', e => { if (e.key === 'Enter') $('saveKeyBtn').click(); });
+
+$('testKeyBtn').addEventListener('click', async () => {
+  const res = $('testResult');
+  res.style.display = 'block';
+  res.style.color = 'var(--muted)';
+  res.textContent = 'Testing…';
+  // save first so the server can test it
+  await fetch('/config', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({api_key: $('apiKeyInput').value.trim()}) });
+  const r = await fetch('/test-key');
+  const d = await r.json();
+  res.style.color = d.ok ? 'var(--green)' : '#e05050';
+  res.textContent = d.ok ? '✓ ' + d.msg : '✗ ' + d.msg;
+});
+
+$('saveKeyBtn').addEventListener('click', async () => {
+  const key = $('apiKeyInput').value.trim();
+  if (!key.startsWith('sk-')) { $('keyError').style.display = 'block'; return; }
+  $('keyError').style.display = 'none';
+  await fetch('/config', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({api_key: key}) });
+  hasKey = true; hideModal();
+});
+
+// ── generate ──────────────────────────────────────────────────────────────────
+$('genBtn').addEventListener('click', async () => {
+  if (!hasKey) { showModal(); return; }
+  $('genBtn').disabled = true;
+  $('genBtn').textContent = 'Generating…';
+  $('dot').classList.add('active');
+  $('statusText').textContent = 'Fetching ideas…';
+
+  const params = {
+    platform: $('platform').value, niche: $('niche').value,
+    format: $('format').value, vibe: $('vibe').value, custom: $('custom').value,
+  };
+
+  try {
+    const r = await fetch('/generate', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(params) });
+    const d = await r.json();
+    if (d.error) throw new Error(d.error);
+    if (!d.ideas || !Array.isArray(d.ideas)) throw new Error(d.error || 'No ideas returned — check the Terminal window for details.');
+    renderIdeas(d.ideas, params);
+    $('statusText').textContent = `6 ideas for ${params.platform} · ${params.niche}  ✓`;
+  } catch(e) {
+    $('ideasContainer').innerHTML = `<div class="placeholder">Error: ${e.message}</div>`;
+    $('statusText').textContent = 'Error  ✗';
+  }
+  $('genBtn').disabled = false;
+  $('genBtn').textContent = '✦  Generate Ideas';
+  $('dot').classList.remove('active');
+});
+
+// ── render ideas ──────────────────────────────────────────────────────────────
+function renderIdeas(ideas, params) {
+  const container = $('ideasContainer');
+  container.innerHTML = '';
+  const list = document.createElement('div');
+  list.className = 'ideas-list';
+
+  const store = load();
+
+  ideas.forEach((idea, i) => {
+    const alreadySaved = store.saved.some(s => s.id === idea.title) || store.filmed.some(s => s.id === idea.title);
+    const card = document.createElement('div');
+    card.className = 'idea-card';
+
+    // top: number + title + save btn
+    const top = document.createElement('div');
+    top.className = 'card-top';
+    top.innerHTML = `<span class="card-num">${i+1}</span>`;
+    const titleEl = document.createElement('span');
+    titleEl.className = 'card-title';
+    titleEl.textContent = idea.title;
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'save-btn' + (alreadySaved ? ' saved' : '');
+    saveBtn.textContent = alreadySaved ? '♡ Saved' : '♡ Save';
+    saveBtn.addEventListener('click', () => saveIdea(idea, params, saveBtn));
+    top.appendChild(titleEl);
+    top.appendChild(saveBtn);
+    card.appendChild(top);
+
+    // hook
+    const hookEl = document.createElement('div');
+    hookEl.className = 'card-hook';
+    hookEl.innerHTML = `<span class="hook-label">Opening hook</span>${escHtml(idea.hook)}`;
+    card.appendChild(hookEl);
+
+    // caption + hashtags
+    const capEl = document.createElement('div');
+    capEl.className = 'card-caption';
+    const tags = (idea.hashtags || []).map(h => `<span class="hashtag">${escHtml(h)}</span>`).join('');
+    capEl.innerHTML = `<span class="caption-label">Caption</span>${escHtml(idea.caption)}<div class="hashtags">${tags}</div>`;
+    card.appendChild(capEl);
+
+    // script toggle
+    const toggleBtn = document.createElement('button');
+    toggleBtn.className = 'script-toggle';
+    toggleBtn.innerHTML = `<span>Script / Filming Guide</span><span class="toggle-arrow">▾</span>`;
+    const scriptBody = document.createElement('div');
+    scriptBody.className = 'script-body';
+    (idea.script || []).forEach((point, pi) => {
+      const row = document.createElement('div');
+      row.className = 'script-point';
+      row.innerHTML = `<span class="point-num">${pi+1}</span><span class="point-text">${escHtml(point)}</span>`;
+      scriptBody.appendChild(row);
+    });
+    toggleBtn.addEventListener('click', () => {
+      const open = scriptBody.classList.toggle('open');
+      toggleBtn.classList.toggle('open', open);
+    });
+    card.appendChild(toggleBtn);
+    card.appendChild(scriptBody);
+
+    list.appendChild(card);
+  });
+
+  container.appendChild(list);
+}
+
+// ── save ──────────────────────────────────────────────────────────────────────
+function saveIdea(idea, params, btn) {
+  const store = load();
+  if (store.saved.some(s => s.id === idea.title) || store.filmed.some(s => s.id === idea.title)) return;
+  store.saved.push({
+    id: idea.title,
+    title: idea.title,
+    hook: idea.hook,
+    script: idea.script,
+    caption: idea.caption,
+    hashtags: idea.hashtags,
+    platform: params.platform,
+    niche: params.niche,
+    savedAt: new Date().toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })
+  });
+  save(store);
+  btn.textContent = '♡ Saved';
+  btn.classList.add('saved');
+  updateBadges();
+  $('statusText').textContent = 'Saved ✓';
+  setTimeout(() => $('statusText').textContent = 'Ready', 2000);
+}
+
+// ── render saved ──────────────────────────────────────────────────────────────
+function renderSaved() {
+  const store = load();
+  const el = $('savedList');
+  el.innerHTML = '';
+  if (!store.saved.length) {
+    el.innerHTML = '<div class="collection-empty">No saved ideas yet.<br>Hit ♡ Save on any idea to keep it here.</div>';
+    return;
+  }
+  const grid = document.createElement('div');
+  grid.className = 'coll-grid';
+  store.saved.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'coll-card';
+    card.innerHTML = `
+      <div class="coll-meta"><span>${item.platform}</span><span>·</span><span>${item.niche}</span><span>·</span><span>${item.savedAt}</span></div>
+      <div class="coll-title">${escHtml(item.title)}</div>
+      <div class="coll-hook">"${escHtml(item.hook)}"</div>
+      <div class="coll-actions">
+        <button class="act-btn filmed">✓ Mark as Filmed</button>
+        <button class="act-btn danger">Remove</button>
+      </div>`;
+    card.querySelector('.filmed').addEventListener('click', () => { moveToFilmed(item.id); });
+    card.querySelector('.danger').addEventListener('click',  () => { removeSaved(item.id); });
+    grid.appendChild(card);
+  });
+  el.appendChild(grid);
+}
+
+// ── render filmed ─────────────────────────────────────────────────────────────
+function renderFilmed() {
+  const store = load();
+  const el = $('filmedList');
+  el.innerHTML = '';
+  if (!store.filmed.length) {
+    el.innerHTML = '<div class="collection-empty">Nothing filmed yet.<br>Move ideas here from Saved Ideas once you\'ve filmed them.</div>';
+    return;
+  }
+  const grid = document.createElement('div');
+  grid.className = 'coll-grid';
+  store.filmed.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'coll-card';
+    card.innerHTML = `
+      <div class="coll-meta"><span>${item.platform}</span><span>·</span><span>${item.niche}</span><span>·</span><span class="filmed-badge">✓ Filmed</span></div>
+      <div class="coll-title">${escHtml(item.title)}</div>
+      <div class="coll-hook">"${escHtml(item.hook)}"</div>
+      <div class="coll-actions"><button class="act-btn danger">Remove</button></div>`;
+    card.querySelector('.danger').addEventListener('click', () => { removeFilmed(item.id); });
+    grid.appendChild(card);
+  });
+  el.appendChild(grid);
+}
+
+function moveToFilmed(id) {
+  const store = load();
+  const i = store.saved.findIndex(s => s.id === id);
+  if (i === -1) return;
+  store.filmed.push(...store.saved.splice(i, 1));
+  save(store); updateBadges(); renderSaved();
+}
+function removeSaved(id) {
+  const store = load(); store.saved = store.saved.filter(s => s.id !== id);
+  save(store); updateBadges(); renderSaved();
+}
+function removeFilmed(id) {
+  const store = load(); store.filmed = store.filmed.filter(s => s.id !== id);
+  save(store); updateBadges(); renderFilmed();
+}
+
+// ── copy all ──────────────────────────────────────────────────────────────────
+$('copyBtn').addEventListener('click', () => {
+  const text = $('ideasContainer').innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    $('copyBtn').textContent = 'Copied ✓';
+    setTimeout(() => $('copyBtn').textContent = 'Copy all', 2000);
+  });
+});
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+checkKey();
+updateBadges();
+</script>
+</body>
+</html>
